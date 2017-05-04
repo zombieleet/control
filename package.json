@@ -1,0 +1,20 @@
+{
+  "name": "control",
+  "author": "zombieleet",
+  "description": "a quick and dirty implementation of printf and sprintf",
+  "license": "MIT",
+  "version": "0.0.1",
+  "main": "control.js",
+  "scripts": {
+      "test": "jasmine test/test.js",
+      "coverage": "istanbul cover jasmine test/test.js",
+      "showcoverage": "firefox coverage/lcov-report/index.html &"
+  },
+  "keywords": [
+    "printf",
+    "sprintf",
+    "format",
+    "modifiers",
+    "control"
+  ]
+}
