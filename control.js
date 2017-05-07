@@ -46,9 +46,9 @@ class Control {
 
 
         // BUG:- FIX THE REGULAR EXPRESSION
-        
+
         let { format, replacementString } = modifiers,
-            _regexp = new RegExp(`^%(.*)(${_this.format().join('|')})+$`),
+            _regexp = new RegExp(`^%(.*)(${_this.format().join('|')})`),
             _modifiers = format.replace(_regexp,"$1");
         if ( _modifiers === '' ) return false;
         return { _regexp, _modifiers };
@@ -77,7 +77,9 @@ class Control {
         case "%ob":
             return _fft(replacementString);
         case "%ar":
-            return _fft(replacementString);            
+            return _fft(replacementString);
+        case "%bi":
+            return Control.toBinary(replacementString);
         default:
             return replacementString;
         }
@@ -178,7 +180,7 @@ class Control {
             //return JSON.stringify(Control.computeDataToPrint(toPrint,replacementString));
             break;
         case "bi":
-
+            return Control.toBinary(replacementString);
         default:
             throw new Error(`This error should never happen`);
 
@@ -215,10 +217,10 @@ class Control {
     static computeNumberPrecision(num = 0, rlstr) {
 
         if ( (num + rlstr) < rlstr ) return "";
-
+        
         if ( num === 0 ) return parseInt(rlstr);
         
-        
+        // www.jacklmoore.com/notes/rounding-in-javascript/
         return Number(Math.round(rlstr+'e'+num)+'e-'+num);
         
     }
@@ -317,6 +319,33 @@ class Control {
 
         return Number(octalvalue.join(''));
     }
+    static toBinary(rlstr) {
+
+        let binary = [], quotient;
+        
+        while ( rlstr > 0 ) {
+            binary.unshift(rlstr % 2);
+            quotient = Math.trunc(rlstr / 2);
+            rlstr = quotient;
+        }
+        
+        binary.unshift(rlstr % 2);
+
+        // for some reason the leading 0 which is a result of rlstr % 2is truncated when coereced to a number
+        
+        //console.log(binary.join(""),parseInt(binary.join("")),Number(binary.join(""));
+
+        return binary.join("");
+        
+    }
+    static *convertStringToInt(rlstr) {
+        
+        for ( let i = 0; i < rlstr.length ; i++ ) {
+            let codePoint = rlstr[i].charCodeAt();
+            yield codePoint;
+        }
+            
+    }
     static toExponent(operand,to = 4) {
         return operand.toExponential(to);
     }
@@ -408,6 +437,36 @@ class Control {
     }
     __BI() {
         // learn how to work with binary numbers
+        Control.shiftFormaters(this, (replacementString,format) => {
+            
+            try {
+                
+                Control.Throws(replacementString,format,"number");
+                return this.ReplaceFindings(format,replacementString);
+                
+            } catch(ex) {
+                
+                Control.Throws(replacementString,format,"string");
+                
+                let gen = Control.convertStringToInt(replacementString),
+                    { value , done } = gen.next(),
+                    binary = [];
+
+                while ( ! done ) {
+                    
+                    binary.push(Control.toBinary(value));
+                    
+                    ({value,done} = gen.next());
+                }
+                
+                let { arguments: { string } } = this;
+                
+                this.arguments.string = string.replace(format,binary.join(""));
+                
+                return true;
+            }
+            
+        });
     }
     __JO() {
         Control.shiftFormaters(this, (replacementString,format) => {
