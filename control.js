@@ -1,8 +1,8 @@
-const { format:_format } = require('util');
+const { format:_fft } = require('util');
 
 class Control {
     constructor() {
-        this.format = () => ['s','d','f','o','ob','ar','e','E','g','G','u','c','jo','bi'];
+        this.format = () => ['ob','ar','jo','bi','s','d','f','o','e','E','g','G','u','c'];
         this.string = undefined; // uh
     }
     static _initControl() {
@@ -36,6 +36,301 @@ class Control {
 
         return true;
     }
+    static shiftFormaters(_this,cb = new Function()) {
+
+        let { replacements, valid } = _this.arguments;
+        cb(replacements.shift(),valid.shift());
+    }
+
+    static checkModifierExistence(modifiers,_this) {
+
+
+        // BUG:- FIX THE REGULAR EXPRESSION
+        
+        let { format, replacementString } = modifiers,
+            _regexp = new RegExp(`^%(.*)(${_this.format().join('|')})+$`),
+            _modifiers = format.replace(_regexp,"$1");
+        if ( _modifiers === '' ) return false;
+        return { _regexp, _modifiers };
+    }
+    static makeNumber(value,rplstr) {
+
+        //return isNaN(Number(value)) ? Number(isNaN(rplstr.length) ? 0 : rplstr.length ) : Number(value);
+
+        if ( isNaN(Number(value)) && ! rplstr.length ) {
+            return 0;
+        } else if ( isNaN(Number(value)) && rplstr.length ) {
+            return rplstr.length;
+        } else {
+            return Number(value);
+        }
+
+    }
+    static formatWithoutModifiers(format,replacementString) {
+        switch(format) {
+        case "%e":
+            return Control.toExponent(replacementString);
+        case "%E":
+            return Control.toExponent(replacementString).toUpperCase();
+        case "%c":
+            return replacementString[0];
+        case "%ob":
+            return _fft(replacementString);
+        case "%ar":
+            return _fft(replacementString);            
+        default:
+            return replacementString;
+        }
+    }
+    static getModifiers(modifiers,_this) {
+
+        let {  format, replacementString } = modifiers,
+
+            val = Control.checkModifierExistence(modifiers,_this);
+        
+        if ( ! val ) {
+            return Control.formatWithoutModifiers(format,replacementString);
+        }
+
+        let regexp = /^(\d+)(\.+)(\d+)$|^(\d+)(\.+)$|^(\d+)$|^(\.+)(\d+)$|^(\.+)$/,
+            { _regexp,_modifiers } = val;
+
+
+        if ( ! /^[0-9\.]+$/.test(_modifiers) ) {
+
+            throw new Error(`invalid character in modifiers ${format}`);
+        }
+
+
+        let _matched = _modifiers.match(regexp),
+
+            [ , f_d1, f_dot, f_d2, s_d1, s_dot, th_d1, fo_dot, fo_d2, fif_dot, , ] = _matched,
+
+            spaceAmount = f_d1 || s_d1 || th_d1,
+
+            dot = f_dot || s_dot || fo_dot || fif_dot,
+
+            toPrint = f_d2 || fo_d2;
+
+        if ( dot && dot.length > 1 ) throw new Error(`invalid modifer in ${format}`);
+
+
+        // support
+        //    num.num
+        //    num.
+        //    .num
+        //    .
+        //    num
+
+        spaceAmount = Control.makeNumber(spaceAmount,replacementString);
+        toPrint = Control.makeNumber(toPrint,replacementString);
+
+        // support standalone num , the '.' is uneccsary
+        //  avoiding long if else if else if statement
+
+        dot = dot ? dot : '.' ;
+
+
+
+        if ( spaceAmount >= 0 && dot && toPrint >= 0) {
+            let space = Control.computeSpace(spaceAmount,replacementString),
+                afterDot = Control.ComputerAfterDot({format,toPrint,replacementString});
+
+            return `${space}${afterDot}`;
+        }
+
+    }
+
+
+
+
+    static ComputerAfterDot({format,toPrint,replacementString}) {
+
+        let value = format.match(/[a-zA-Z]+$/);
+
+        switch(value[0]) {
+        case "s":
+            return Control.computeStringTriming(toPrint,replacementString);
+        case "d":
+            return Control.computeDecimalPlace(toPrint,replacementString);
+        case "f":
+            return Control.computeNumberPrecision(toPrint,replacementString);
+        case "o":
+            return Control.computeDecimalPlace(toPrint,replacementString);
+        case "ob":
+            return Control.computeDataToPrint(toPrint,replacementString);
+        case "ar":
+            return Control.computeDataToPrint(toPrint,replacementString);
+        case "e":
+            return Control.toExponent(replacementString,toPrint);
+        case "E":
+            // to convert e to capital letter E
+            return Control.toExponent(replacementString,toPrint).toUpperCase();
+        case "g":
+
+        case "G":
+
+        case "u":
+
+        case "c":
+            return Control.computeStringTriming(toPrint,replacementString);
+        case "jo":
+            //return JSON.stringify(Control.computeDataToPrint(toPrint,replacementString));
+            break;
+        case "bi":
+
+        default:
+            throw new Error(`This error should never happen`);
+
+        }
+    }
+    static computeSpace(num = 0,rlstr) {
+
+        let space = "";
+
+        while ( num-- > 0 ) {
+            space += " ";
+        }
+
+        return space;
+
+        // return " ".repeat(num);
+
+    }
+    static computeDecimalPlace(num = 0, rlstr) {
+
+        let _rlstr = String(rlstr);
+
+        if ( (num + rlstr) < rlstr ) return ;
+
+        let value = "";
+
+        while ( num-- > _rlstr.length ) {
+            value = "0" + value;
+        }
+
+        return `${value}${rlstr}`;
+
+    }
+    static computeNumberPrecision(num = 0, rlstr) {
+
+        if ( (num + rlstr) < rlstr ) return "";
+
+        if ( num === 0 ) return parseInt(rlstr);
+        
+        
+        return Number(Math.round(rlstr+'e'+num)+'e-'+num);
+        
+    }
+
+    static computeDataToPrint(num,rlstr) {
+        let retValue ;
+        if ( Array.isArray(rlstr) ) {
+
+            retValue = [];
+
+            let i = 0;
+
+            for ( let _n of Control.__DataToPrint(num) )
+                retValue.push(rlstr[i++]);
+
+            return retValue;
+        }
+
+        retValue = {};
+
+        let prop = Object.keys(rlstr), i = 0;
+
+        for ( let _n of Control.__DataToPrint(num) ) {
+            if ( ! prop[i] ) break;
+            Object.assign(retValue, {
+                [prop[i]]: rlstr[prop[i]]
+            });
+            i++;
+        }
+
+        return _fft(retValue);
+
+
+    }
+    static *__DataToPrint(num) {
+        while ( num-- > 0 ) {
+            yield num;
+        }
+    }
+    static negativeModifier(num,rlstr) {
+        // handle negative modifier
+        if ( (num + rlstr) < rlstr ) return "";
+    }
+    static computeStringTriming(num = 0,rlstr) {
+        return rlstr.slice(0,num);
+    }
+
+
+    static checkLength(replace,valid) {
+
+        if ( (replace.length === valid.length) && ! valid.includes("%%") ) {
+            return true;
+        }
+
+        let _valid = valid.filter( x => x !== "%%" );
+        let _replace = replace.filter(x => x !== "%%");
+
+        return (_replace.length === _valid.length);
+
+    }
+    static handleFormaters(formaters,_this) {
+
+        // arrays are passed by reference in javascript
+        // because they are object
+        // Array.of creates a new array off from formaters
+
+        const _formaters = Array.of(...formaters);
+
+        for ( let i = 0 ; i < _formaters.length; i++ ) {
+
+            let method = _formaters[i].match(/([a-zA-Z])+$/);
+
+            if ( method ) {
+
+                try {
+                    _this[`__${method[0].toUpperCase()}`]();
+                    continue ;
+                } catch(ex) {
+                    throw ex;
+                }
+            }
+            _this.__Escape();
+        }
+    }
+
+    static toOctal(operand) {
+
+        let octalvalue = [];
+        let remainder;
+
+
+        do {
+            remainder = operand % 8;
+            octalvalue.unshift(remainder);
+        } while ((operand = Math.trunc(operand/8)) !== 0 )
+
+        return Number(octalvalue.join(''));
+    }
+    static toExponent(operand,to = 4) {
+        return operand.toExponential(to);
+    }
+
+    ReplaceFindings(format,replacementString) {
+        
+        const { arguments: { string } } = this;
+        
+        replacementString = Control.getModifiers({string,format,replacementString},this);
+
+        this.arguments.string = string.replace(format,replacementString);
+
+        return true;        
+    }
     printf(string, ...replacements) {
 
         if ( ! Control.isString(string) )
@@ -61,68 +356,13 @@ class Control {
             replacements,
             valid
         };
-        
+
         Control.handleFormaters(valid,this);
 
-        //console.log(this.arguments.string);
+        console.log(this.arguments.string);
         return true;
     }
 
-    static checkLength(replace,valid) {
-
-        if ( (replace.length === valid.length) && ! valid.includes("%%") ) {
-            return true;
-        }
-
-        let _valid = valid.filter( x => x !== "%%" );
-        let _replace = replace.filter(x => x !== "%%");
-        //console.log(replace,valid);
-
-
-        return (_replace.length === _valid.length);
-
-    }
-    static handleFormaters(formaters,_this) {
-
-        // arrays are passed by reference in javascript
-        // because they are object
-        // Array.of creates a new array off from formaters
-        
-        const _formaters = Array.of(...formaters);
-
-        for ( let i = 0 ; i < _formaters.length; i++ ) {
-
-            let method = _formaters[i].match(/([a-zA-Z])+$/);
-            
-            if ( method ) {
-
-                try {
-                    _this[`__${method[0].toUpperCase()}`]();
-                    continue ;
-                } catch(ex) {
-                    throw ex;
-                }
-            }
-            _this.__Escape();
-        }
-    }
-    
-    static toOctal(operand) {
-
-        let octalvalue = [];
-        let remainder;
-
-
-        do {
-            remainder = operand % 8;
-            octalvalue.unshift(remainder);
-        } while ((operand = Math.trunc(operand/8)) !== 0 )
-        
-        return Number(octalvalue.join(''));
-    }
-    static toExponent(operand,to = 4) {
-        return operand.toExponential(to);
-    }
     __Escape() {
 
         Control.shiftFormaters(this, (replacementString,format) => {
@@ -152,12 +392,7 @@ class Control {
                 throw new Error(`invalid replacement string for ${format}`);
             }
 
-            replacementString = Control.toExponent(replacementString);
-            
-            const { arguments: { string } } = this;
-
-            this.arguments.string = string.replace(format,replacementString);
-            return true;
+            return this.ReplaceFindings(format,replacementString);
         });
     }
     __O() {
@@ -165,13 +400,10 @@ class Control {
         Control.shiftFormaters(this, (replacementString,format) => {
 
             Control.Throws(replacementString,format,"number");
-            
+
             replacementString = Control.toOctal(replacementString);
 
-            const { string } = this.arguments;
-
-            this.arguments.string = string.replace(format, replacementString);
-            return true;
+            return this.ReplaceFindings(format,replacementString);
         });
     }
     __BI() {
@@ -181,7 +413,7 @@ class Control {
         Control.shiftFormaters(this, (replacementString,format) => {
 
             Control.Throws(replacementString,format,"string");
-            
+
             try {
 
                 JSON.parse(replacementString);
@@ -191,23 +423,17 @@ class Control {
                 throw new Error(err);
 
             }
-
-            const { string } = this.arguments;
-
-            this.arguments.string = string.replace(format, replacementString);
-
-            return true;
+            
+            return this.ReplaceFindings(format,replacementString);
         });
     }
     __C() {
         Control.shiftFormaters(this, (replacementString,format) => {
 
             Control.Throws(replacementString,format,"string");
-
-            const { string } = this.arguments;
-
-            this.arguments.string = string.replace(format, replacementString[0]);
-            return true;
+            
+            return this.ReplaceFindings(format,replacementString);
+            
         });
     }
     __AR() {
@@ -216,11 +442,9 @@ class Control {
             if ( ! Array.isArray(replacementString) ) {
                 throw new Error(`type mismatch at ${replacementString}`);
             }
-
-            const { string } = this.arguments;
-
-            this.arguments.string = string.replace(format,replacementString);
-            return true;
+            
+            return this.ReplaceFindings(format,replacementString);
+            
         });
     }
     __OB() {
@@ -232,10 +456,7 @@ class Control {
                 throw new Error(`expected ${replacementString} to be an object but got an array`);
             }
 
-            const { string } = this.arguments;
-
-            this.arguments.string = string.replace(format,_format(replacementString));
-            return true;
+            return this.ReplaceFindings(format,replacementString);
 
         });
     }
@@ -246,11 +467,7 @@ class Control {
             Control.Throws(replacementString,format,"number");
 
 
-            // non global, don't think too much o.O
-            const { string } = this.arguments;
-
-            this.arguments.string = string.replace(format,parseInt(replacementString));
-            return true;
+            return this.ReplaceFindings(format,replacementString);
 
         });
     }
@@ -260,16 +477,7 @@ class Control {
             Control.Throws(replacementString,format,"string");
 
 
-            // non global, don't think too much o.O
-
-
-            const { string } = this.arguments;
-
-            Control.getModifiers({string,format,replacementString},this);
-
-            this.arguments.string = string.replace(format,replacementString);
-
-            return true;
+            return this.ReplaceFindings(format,replacementString);
 
         });
     }
@@ -278,114 +486,10 @@ class Control {
 
             Control.Throws(replacementString,format,"number");
 
-            const { string } = this.arguments;
-
-
-            this.arguments.string = string.replace(format,parseFloat(replacementString));
-
-            return true;
+            return this.ReplaceFindings(format,replacementString);
         });
-    }
-    static shiftFormaters(_this,cb = new Function()) {
-
-        let { replacements, valid } = _this.arguments;
-        cb(replacements.shift(),valid.shift());
-    }
-
-    static checkModifierExistence(modifiers,_this) {
-
-        let { format, replacementString } = modifiers,
-            _regexp = new RegExp(`^%(.*)(${_this.format().join('|')})$`),
-            _modifiers = format.replace(_regexp,"$1");
-        
-        if ( _modifiers === '' ) return false;
-        
-        return { _regexp, _modifiers };
-    }
-    static makeNumber(value,rplstr) {
-        // rplstr.length the length of the replacement string
-        return isNaN(Number(value)) ? Number(rplstr.length) : Number(value);
-    }
-    static getModifiers(modifiers,_this) {
-        
-        let {  format, replacementString } = modifiers,
-            
-            val = Control.checkModifierExistence(modifiers,_this);
-
-        if ( ! val ) return false;
-        
-        
-        let regexp = /^(\d+)(\.+)(\d+)$|^(\d+)(\.+)$|^(\d+)$|^(\.+)(\d+)$|^(\.+)$/,
-            { _regexp,_modifiers } = val;
-        
-        
-        if ( ! /^[0-9\.]+$/.test(_modifiers) ) {
-
-            throw new Error(`invalid character in modifiers ${format}`);
-        }
-        
-
-        let _matched = _modifiers.match(regexp),
-            
-            [ , f_d1, f_dot, f_d2, s_d1, s_dot, th_d1, fo_dot, fo_d2, fif_dot, , ] = _matched,
-            
-            spaceAmount = f_d1 || s_d1 || th_d1,
-            
-            dot = f_dot || s_dot || fo_dot || fif_dot,
-            
-            toPrint = f_d2 || fo_d2;
-
-        if ( dot && dot.length > 1 ) throw new Error(`invalid modifer in ${format}`);
-
-
-        // support
-        //    num.num
-        //    num.
-        //    .num
-        //    .
-        //    num
-        
-        spaceAmount = Control.makeNumber(spaceAmount,replacementString);
-        toPrint = Control.makeNumber(toPrint,replacementString);
-        
-        // support standalone num , the '.' is uneccsary
-        //  avoiding long if else if else if statement
-        
-        dot = dot ? dot : '.' ; 
-        
-        if ( spaceAmount >= 0 && dot && toPrint >= 0) {
-            
-            console.log(Control.computeSpace(spaceAmount,replacementString) + Control.computeStringTriming(toPrint,replacementString));
-            return true;
-        }
-
-    }
-
-    static computeSpace(num = 0,rlstr) {
-
-
-        if ( num  <= rlstr.length ) return "";
-
-        let space = "";
-
-        while ( num-- > 0 ) {
-            space += " ";
-        }
-
-        return space;
-
-        // return " ".repeat(num);
-
-    }
-
-    static computeNumberPrecision() {
-    }
-    static computeStringTriming(num = 0,rlstr) {
-        return rlstr.slice(0,num);
     }
 }
 
 
 module.exports = Control._initControl();
-
-//console.log(Control.toOctal(0666));
