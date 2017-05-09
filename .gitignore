@@ -3,4 +3,5 @@ index.js
 lib/
 spec/
 coverage/
+__tt.js
 
