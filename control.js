@@ -2,7 +2,7 @@ const { format:_fft } = require('util');
 
 class Control {
     constructor() {
-        this.format = () => ['ob','ar','jn','bi','s','d','f','o','e','E','g','G','u','c'];
+        this.format = () => ['ob','ar','jn','bi','s','d','f','o','e','E','g','G','u','c','x','X'];
         this.string = undefined; // uh
     }
     static _initControl() {
@@ -43,9 +43,6 @@ class Control {
     }
 
     static checkModifierExistence(modifiers,_this) {
-
-
-        // BUG:- FIX THE REGULAR EXPRESSION
 
         let { format, replacementString } = modifiers,
             _regexp = new RegExp(`^%(.*)(${_this.format().join('|')})`),
@@ -93,6 +90,10 @@ class Control {
             return _fft(replacementString);
         case "%bi":
             return Control.toBinary(replacementString);
+        case "%x":
+            return Control.toHex(replacementString);
+        case "%u":
+            return Control.toUint(replacementString);
         default:
             return replacementString;
         }
@@ -214,15 +215,19 @@ class Control {
         case "g":
 
         case "G":
-
+            
         case "u":
-
+            return Control.computeDecimalPlace(toPrint, Control.toUint(replacementString));
         case "c":
             return Control.computeStringTriming(toPrint,replacementString);
         case "jn":
             return JSON.stringify(Control.computeDataToPrint(toPrint,replacementString));
         case "bi":
             return Control.toBinary(replacementString);
+        case "x":
+            return Control.toHex(replacementString);
+        case "X":
+            return Control.toHex(replacementString).toUpperCase();
         default:
             throw new Error(`This error should never happen`);
         }
@@ -240,6 +245,36 @@ class Control {
         // return " ".repeat(num);
 
     }
+    static toHex(rlstr) {
+        // return rlstr.toString(16)
+        let remainder = [],quotient = rlstr;
+        
+        do {
+            
+            let _remainder = quotient % 16;
+            
+            quotient = Math.trunc(quotient / 16);
+            
+            
+            if ( _remainder < 10 ) {
+                remainder.unshift(_remainder);
+                continue;
+            }
+            
+            remainder.unshift(_remainder.toString(16));
+            
+        } while (quotient > 0 )
+        
+        return remainder.join("");
+    }
+    static toUint(rlstr) {
+        
+        // 32bit;
+        // return new Uint32Array([rlstr])[0];
+        return rlstr >>> 0;
+
+        
+    }
     static *convertStringToInt(rlstr) {
         
         for ( let i = 0; i < rlstr.length ; i++ ) {
@@ -255,7 +290,7 @@ class Control {
     }
 
     static toOctal(operand) {
-        
+        // return rlstr.toString(8)
         let octalvalue = [];
         let remainder;
         
@@ -268,7 +303,7 @@ class Control {
         return Number(octalvalue.join(''));
     }
     static toBinary(rlstr) {
-
+        // return rlstr.toString(2)
         let binary = [], quotient;
         
         while ( rlstr > 0 ) {
@@ -375,12 +410,12 @@ class Control {
         if ( ! Control.isString(string) )
             throw new Error(`${string} is not a valid string`);
 
-
+        // /%(.*)(${_this.format().join('|')})/
         const formaters = string.split(' ').map( _getAllFormaters => {
             const _matched = _getAllFormaters.match(/^(%.*)$/);
             if ( _matched ) return _matched[0];
         }).filter( _removeUndefined => _removeUndefined);
-
+        
         let { status, valid } = Control.validate(formaters,this);
 
         if ( ! status )
@@ -398,12 +433,10 @@ class Control {
 
         Control.handleFormaters(valid,this);
 
-        console.log(this.arguments.string);
+        //console.log(this.arguments.string);
         
-        // reset currentFormater back to undefined
-        this.currentFormater = undefined;
         
-        return true;
+        return this.arguments.string;
     }
 
     __Escape() {
@@ -427,6 +460,11 @@ class Control {
     }
     __U() {
         // learn how to make numbers unsgined integers in javascript
+        Control.shiftFormaters(this,(replacementString,format) => {
+            Control.Throws(replacementString,format,"number");
+
+            return this.ReplaceFindings(format,replacementString);
+        });
     }
     __E() {
         // learn how to work with expontents in javascript
@@ -559,6 +597,12 @@ class Control {
 
             Control.Throws(replacementString,format,"number");
 
+            return this.ReplaceFindings(format,replacementString);
+        });
+    }
+    __X() {
+        Control.shiftFormaters(this,(replacementString,format) => {
+            Control.Throws(replacementString,"format","number");
             return this.ReplaceFindings(format,replacementString);
         });
     }
