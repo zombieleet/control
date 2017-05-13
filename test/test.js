@@ -8,6 +8,7 @@ describe("#printf test", () => {
     let failFormater;
     let successFormater;
     let realFormat;
+
     beforeEach(() => {
 
         failFormater = "%s %d %f %% %z";
@@ -22,8 +23,68 @@ describe("#printf test", () => {
         successFormater = undefined;
         realFormat = undefined;
     });
+    
 
+    /*it("spies", () => {
+        spyOn(control, "printf").and.callFake(() => {
+            return {};
+        });
 
+        control.printf("%s",3);
+        expect(typeof control.printf.calls.argsFor(0)[1]).toEqual('string');
+     });*/
+
+    
+    describe("#make sure that all formaters was called", () => {
+        beforeEach(() => {
+
+            spyOn(control, "__S");
+            spyOn(control, "__JN");
+            spyOn(control, "__D");
+            spyOn(control, "__C");
+            spyOn(control, "__E");
+            spyOn(control, "__F");
+            spyOn(control, "__O");
+            spyOn(control, "__BI");
+            spyOn(control, "__AR");
+            spyOn(control, "__OB");
+            
+            control.printf(`all this formaters method must be called %s %jn %d %c %e %f %o %bi %ar %ob`, "string", JSON.stringify({json:'json'}),23,"character",2.2,23.5,0x5ad,"binary", ["array"], {object:'object'});        
+            
+        });
+        
+        it("should pass if __S function was called", () => {
+            expect(control.__S).toHaveBeenCalled();
+        });
+        it("should pass if __JN function was called", () => {
+            expect(control.__JN).toHaveBeenCalled();
+        });
+        it("should pass if __D function was called", () => {
+            expect(control.__D).toHaveBeenCalled();
+        });
+        it("should pass if __C function was called", () => {
+            expect(control.__C).toHaveBeenCalled();
+        });
+        it("should pass if __E function was called", () => {
+            expect(control.__E).toHaveBeenCalled();
+        });
+        it("should pass if __F function was calle", () => {
+            expect(control.__F).toHaveBeenCalled();
+        });
+        it("should pass if __O function was called", () => {
+            expect(control.__O).toHaveBeenCalled();
+        });
+        it("should pass if __BI function was called", () => {
+            expect(control.__BI).toHaveBeenCalled();
+        });
+        it("should pass if __AR function was called", () => {
+            expect(control.__AR).toHaveBeenCalled();
+        });
+        it("should pass if __OB function was called", () => {
+            expect(control.__OB).toHaveBeenCalled();
+        });
+
+    });
     describe("#handle printf argument", () => {
         it("should throw error if replacementString does not equal format sepcifiers", () => {
             expect(() => control.printf(successFormater))
@@ -38,7 +99,7 @@ describe("#printf test", () => {
         });
 
         it("should succeed if first argument is a string with valid format specifier", () => {
-            expect(control.printf(successFormater,"string", 12, 12.5)).toEqual(true);
+            expect(control.printf(successFormater,"string", 12, 12.5)).toEqual("string 12 12.5 %");
         });
     });
 
@@ -47,7 +108,7 @@ describe("#printf test", () => {
             expect(() => control.printf(failFormater)).toThrowError("%z is not a valid format");
         });
         it("should succeed whenever a valid format is specified", () => {
-            expect(control.printf(successFormater, "string", 12, 12.5)).toEqual(true);
+            expect(control.printf(successFormater, "string", 12, 12.5)).toEqual("string 12 12.5 %");
         });
     });
 
@@ -57,14 +118,14 @@ describe("#printf test", () => {
         });
 
         it("should return true if %% is not in format", () => {
-            expect(control.printf(realFormat,"string",12,12.5)).toEqual(true);
+            expect(control.printf(realFormat,"string",12,12.5)).toEqual("string 12 12.5 ");
         });
     });
 
     describe("#test for valid formaters", () => {
         describe("test for json formater", () => {
             it("should return true for valid json data", () => {
-                expect(control.printf("%jn", JSON.stringify({}))).toEqual(true);
+                expect(control.printf("%jn", JSON.stringify({}))).toEqual("{}");
             });
             it("should throw error for non json types", () => {
                 expect(() => control.printf("%jn", {})).toThrowError("type mismatch at [object Object]");
@@ -77,7 +138,7 @@ describe("#printf test", () => {
 
         describe("test for charcter formater", () => {
             it("should return true for valid character", () => {
-                expect(control.printf("%c", "victory")).toEqual(true);
+                expect(control.printf("%c", "victory")).toEqual("v");
             });
             it("should throw error for invalid replacement for character", () => {
                 expect(() => control.printf("%c", 12)).toThrowError("type mismatch at 12");
