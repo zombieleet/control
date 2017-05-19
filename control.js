@@ -2,7 +2,7 @@ const { format:_fft } = require('util');
 
 class Control {
     constructor() {
-        this.format = () => ['ob','ar','jn','bi','s','d','f','o','e','E','g','G','u','c','x','X'];
+        this.format = ['ob','ar','jn','bi','s','d','f','o','e','E','g','G','u','c','x','X'];
         this.string = undefined; // uh
     }
     static _initControl() {
@@ -15,7 +15,7 @@ class Control {
         
         let validFormat = [];
 
-        let regexp = new RegExp(`(${_this.format().join('|')})$`);
+        let regexp = new RegExp(`(${_this.format.join('|')})$`);
 
         for ( let _isValid of _format ) {
 
@@ -45,7 +45,7 @@ class Control {
     static checkModifierExistence(modifiers,_this) {
 
         let { format, replacementString } = modifiers,
-            _regexp = new RegExp(`^%(.*)(${_this.format().join('|')})`),
+            _regexp = new RegExp(`^%(.*)(${_this.format.join('|')})`),
             _modifiers = format.replace(_regexp,"$1");
         if ( _modifiers === '' ) return false;
         return { _regexp, _modifiers };
@@ -410,12 +410,32 @@ class Control {
         if ( ! Control.isString(string) )
             throw new Error(`${string} is not a valid string`);
 
-        // /%(.*)(${_this.format().join('|')})/
-        const formaters = string.split(' ').map( _getAllFormaters => {
-            const _matched = _getAllFormaters.match(/^(%.*)$/);
-            if ( _matched ) return _matched[0];
-        }).filter( _removeUndefined => _removeUndefined);
         
+        let _joined = this.format.join('|');
+        //let _rgpx = new RegExp(`((%%)|(%)(${_joined})|(%)(.*)(${_joined}))`,"g");
+        let _rgpx = new RegExp(`((%%)|(%)(${_joined})|(%)(\\d+)(${_joined})|(%)(\\d+)(\\.)(${_joined})|(%)(\\d+)(\\.)(-\\d+)(${_joined})|(%)(\\d+)(\\.)(\\d+)(${_joined})|(%)(\\.)(${_joined})|(%)(\\.)(-\\d+)(${_joined})|(%)(\\.)(\\d+)(${_joined})|(%)(.*)([a-zA-Z]+))`,"g");
+        
+        let formaters = string.split(/[^a-zA-Z\.%-\d+]+/);
+
+        let _formaters = [];
+
+        formaters.forEach(x => {
+            const _matched = x.match(_rgpx);
+
+            if ( _matched && _matched.length < 2 ) {
+                return _formaters.push(_matched[0]);
+            } 
+
+            if ( _matched && _matched.length > 1 ) {
+                for ( let val of _matched ) {
+                  _formaters.push(val);
+                }
+            }
+        });
+        
+        formaters = _formaters;
+        _formaters = undefined;
+
         let { status, valid } = Control.validate(formaters,this);
 
         if ( ! status )
