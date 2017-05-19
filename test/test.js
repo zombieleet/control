@@ -48,8 +48,9 @@ describe("#printf test", () => {
             spyOn(control, "__BI");
             spyOn(control, "__AR");
             spyOn(control, "__OB");
-            
-            control.printf(`all this formaters method must be called %s %jn %d %c %e %f %o %bi %ar %ob`, "string", JSON.stringify({json:'json'}),23,"character",2.2,23.5,0x5ad,"binary", ["array"], {object:'object'});        
+            spyOn(control, "__U");
+            spyOn(control, "__X");
+            control.printf(`all this formaters method must be called %s %jn %d %c %e %f %o %bi %ar %ob %u %x`, "string", JSON.stringify({json:'json'}),23,"character",2.2,23.5,0x5ad,"binary", ["array"], {object:'object'}, -1, 22);        
             
         });
         
@@ -83,6 +84,12 @@ describe("#printf test", () => {
         it("should pass if __OB function was called", () => {
             expect(control.__OB).toHaveBeenCalled();
         });
+        it("should pass if __U function was called", () => {
+            expect(control.__U).toHaveBeenCalled();
+        });        
+        it("should pass if __X function was called", () => {
+            expect(control.__X).toHaveBeenCalled();
+        });        
 
     });
     describe("#handle printf argument", () => {
@@ -100,6 +107,9 @@ describe("#printf test", () => {
 
         it("should succeed if first argument is a string with valid format specifier", () => {
             expect(control.printf(successFormater,"string", 12, 12.5)).toEqual("string 12 12.5 %");
+        });
+        it("should work for formaters that are joined together", () => {
+            expect(control.printf("vic%sor%s","t","y")).toEqual(`victory`);
         });
     });
 
@@ -180,6 +190,17 @@ describe("#printf test", () => {
             });
         });
 
+        describe("test for unsgined integers", () => {
+            it("should print unsigined integers", () => {
+                expect(control.printf("%u", -1)).toEqual(`4294967295`);
+            });
+        });
+
+        describe("test for hexadecimal numbers ", () => {
+            it("should print hexadecimal numbers", () => {
+                expect(control.printf("%x",22)).toEqual(`16`);
+            });
+        });
 
     });
 
