@@ -150,8 +150,11 @@ class Control {
 
         _matched = _matched[0];
 
+        if ( /(\.{2,})/.test(_matched) ) {
+            throw new Error(`invalid modifier in ${format}`);
+        }
+        
         let [ spaceAmount, toPrint ] = _matched.split('.');
-
 
         let dot = '.';
         
