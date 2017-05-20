@@ -211,6 +211,9 @@ describe("#printf test", () => {
         it("should return return true for string triming", () => {
             expect(control.printf("%12.3s", "hello")).toBeTruthy();
         });
+        it("should throw an error if dot is more than one", () => {
+            expect(() => control.printf("%12..5s", "hello")).toThrowError(`invalid modifier in %12..5s`);
+        });
         it("should throw an error if modifier contains a character", () => {
             expect(() => control.printf("%12a..5s", "hello")).toThrowError(`invalid character in modifiers %12a..5s`);
         });
