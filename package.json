@@ -1,5 +1,5 @@
 {
-  "name": "control",
+  "name": "control-js",
   "author": "zombieleet",
   "description": "a quick and dirty implementation of printf and sprintf",
   "license": "MIT",
