@@ -13,7 +13,7 @@ if you can work with c printf or the shell `printf` functionality, control will 
 1. %s  "for strings"
 2. %d  "for digits"
 3. %f  "for floating point numbers"
-4. %u "for unicode numbers"
+4. %u "for unsigned integers"
 5. %jn "for json data"
 6. %ob "for javascript objects"
 7. %bi "for binary numbers"
