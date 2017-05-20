@@ -6,9 +6,9 @@
   "version": "0.0.1",
   "main": "control.js",
   "scripts": {
-      "test": "jasmine test/test.js",
-      "coverage": "istanbul cover jasmine test/test.js",
-      "showcoverage": "firefox coverage/lcov-report/index.html &"
+    "test": "jasmine test/test.js",
+    "coverage": "istanbul cover jasmine test/test.js",
+    "showcoverage": "firefox coverage/lcov-report/index.html &"
   },
   "keywords": [
     "printf",
@@ -16,5 +16,9 @@
     "format",
     "modifiers",
     "control"
-  ]
+  ],
+  "devDependencies": {
+    "istanbul": "^0.4.5",
+    "jasmine": "^2.6.0"
+  }
 }
