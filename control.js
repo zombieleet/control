@@ -129,52 +129,40 @@ class Control {
         let {  format, replacementString } = modifiers,
 
             val = Control.checkModifierExistence(modifiers,_this);
-        
+
         if ( ! val ) {
             return Control.formatWithoutModifiers(format,replacementString);
         }
-
+        
         let regexp = /^(\d+)(\.+)(\d+)$|^(\d+)(\.+)(-\d+)$|^(\d+)(\.+)$|^(\d+)$|^(\.+)(\d+)$|^(\.+)(-\d+)$|^(\.+)$/,
             { _regexp,_modifiers } = val;
-
 
         if ( ! /^[0-9-\.]+$/.test(_modifiers) ) {
             throw new Error(`invalid character in modifiers ${format}`);
         }
+        
+        let _matched = _modifiers.match(regexp);
 
-        let _matched = _modifiers.match(regexp),
-            
-            [ , f_d1, f_dot, f_d2, s_d1, s_dot, s_neg , th_d1, th_dot, fo_d1, fif_dot, fif_d1, six_dot, six_neg, sev_dot, ] = _matched,
-
-            spaceAmount = f_d1 || s_d1 || th_d1,
-
-            dot = f_dot || s_dot || fif_dot || six_dot || sev_dot,
-
-            toPrint = f_d2 || s_neg || fif_d1 || six_neg;
+        if ( ! _matched ) {
+            throw new Error(`unknown error while matching fieldwithds`);
+        }
 
 
-        if ( dot && dot.length > 1 ) throw new Error(`invalid modifer in ${format}`);
+        _matched = _matched[0];
+
+        let [ spaceAmount, toPrint ] = _matched.split('.');
 
 
-        // support
-        //    num.num
-        //    num.
-        //    .num
-        //    .
-        //    num
-
+        let dot = '.';
+        
         spaceAmount = Control.makeNumber(spaceAmount,replacementString);
         toPrint = Control.makeNumber(toPrint,replacementString);
-        // support standalone num , the '.' is uneccsary
-        //  avoiding long if else if else if statement
-
-        dot = dot ? dot : '.' ;
-
-
-        if ( spaceAmount >= 0 && dot && (toPrint >= 0 )) {
+        
+        
+        if ( spaceAmount >= 0 && toPrint >= 0 ) {
             let space = Control.computeSpace(spaceAmount,replacementString),
                 afterDot = Control.ComputerAfterDot({format,toPrint,replacementString,_this});
-            
+
             return `${space}${afterDot}`;
         } else if ( toPrint < 0 && /o$/.test(format) ) {
             
@@ -240,10 +228,11 @@ class Control {
             space += " ";
         }
 
+        
         return space;
 
-        // return " ".repeat(num);
-
+        //return " ".repeat(num);
+        
     }
     static toHex(rlstr) {
         // return rlstr.toString(16)
@@ -428,7 +417,7 @@ class Control {
 
             if ( _matched && _matched.length > 1 ) {
                 for ( let val of _matched ) {
-                  _formaters.push(val);
+                    _formaters.push(val);
                 }
             }
         });
@@ -453,7 +442,7 @@ class Control {
 
         Control.handleFormaters(valid,this);
 
-        //console.log(this.arguments.string);
+        console.log(this.arguments.string);
         
         
         return this.arguments.string;
