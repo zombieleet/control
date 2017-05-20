@@ -201,9 +201,9 @@ class Control {
             // to convert e to capital letter E
             return Control.toExponent(replacementString,toPrint).toUpperCase();
         case "g":
-
+            break;
         case "G":
-            
+            break;
         case "u":
             return Control.computeDecimalPlace(toPrint, Control.toUint(replacementString));
         case "c":
