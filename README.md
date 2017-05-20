@@ -126,3 +126,9 @@ precision works for the flowing formaters
 **NOTE**
 
 if an invalid replacement string is specified for any formater, an error will be throwed
+
+# LICENSE
+
+MIT
+
+GNU ( either version 2 of the License, or at your option any later version.  )
