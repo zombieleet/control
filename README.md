@@ -25,7 +25,7 @@ if you can work with c printf or the shell `printf` functionality, control will 
 **how to use formaters**
 
 ```javascript
-    const control = require('control');
+    const control = require('./control');
     // using destructuring on printf will make the `this` keyword points to undefined
     const printf = control.printf.bind(control);
     
@@ -52,7 +52,7 @@ fieldwidths is the number of space a replacement string should forgo
 
 ```javascript
 
-    const control = require('control');
+    const control = require('./control');
     
     const printf = control.printf.bind(control);
 
@@ -72,7 +72,7 @@ precision works for the flowing formaters
 4. %u
 
 ```javascript
-    const control = require('control');
+    const control = require('./control');
     
     const printf = control.printf.bind(control);
     
@@ -115,7 +115,7 @@ precision works for the flowing formaters
 
 ```javascript
     
-    const control = require('control');
+    const control = require('./control');
     const printf = control.printf.bind(control);
     
     printf("%.4c %.4s", "javascript", "node.js");
