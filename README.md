@@ -2,6 +2,10 @@
 
 Control is an implementation of few of C `printf` functionality with extended features
 
+# how to install
+
+npm install --save control-js
+
 
 # usage
 
