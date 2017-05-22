@@ -6,7 +6,6 @@ Control is an implementation of few of C `printf` functionality with extended fe
 
 npm install --save control-js
 
-
 # usage
 
 if you can work with c printf or the shell `printf` functionality, control will be easy
