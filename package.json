@@ -8,7 +8,8 @@
   "scripts": {
     "test": "jasmine test/test.js",
     "coverage": "istanbul cover jasmine test/test.js",
-    "showcoverage": "firefox coverage/lcov-report/index.html &"
+    "showcoverage": "firefox coverage/lcov-report/index.html &",
+    "lint": "eslint control.js"
   },
   "keywords": [
     "printf",
@@ -18,6 +19,7 @@
     "control"
   ],
   "devDependencies": {
+    "eslint": "^3.19.0",
     "istanbul": "^0.4.5",
     "jasmine": "^2.6.0"
   }
