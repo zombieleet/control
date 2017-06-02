@@ -28,7 +28,7 @@ if you can work with c printf or the shell `printf` functionality, control will 
 **how to use formaters**
 
 ```javascript
-    const { printf } = require('./control');
+    const { printf } = require('control-js');
     
     printf("my name is %s", "victory");
     printf("the first letter of my name is %c", "victory");
@@ -39,7 +39,7 @@ if you can work with c printf or the shell `printf` functionality, control will 
 
 ```javascript
 
-    const { printf } = require('./control');
+    const { printf } = require('control-js');
     
     printf("the %s cost %d", "bacon");
 
@@ -51,7 +51,7 @@ fieldwidths is the number of space a replacement string should forgo
 
 ```javascript
 
-    const { printf } = require('./control');
+    const { printf } = require('control-js');
 
     printf("the %34s cost dollars %d", "bacon",100);
 
@@ -70,7 +70,7 @@ precision works for the flowing formaters
 
 ```javascript
 
-    const { printf } = require('./control');    
+    const { printf } = require('control-js');    
 
     printf("%3.22d %.55u %.15e %.2f", 12, -1, 23, 24.56735);
     
@@ -84,7 +84,7 @@ precision works for the flowing formaters
 
 ```javascript
 
-    const { printf } = require('./control');
+    const { printf } = require('control-js');
     
     const obj = {
         firstname:"victory",
@@ -109,7 +109,7 @@ precision works for the flowing formaters
 
 ```javascript
     
-    const { printf } = require('./control');
+    const { printf } = require('control-js');
     
     printf("%.4c %.4s", "javascript", "node.js");
     

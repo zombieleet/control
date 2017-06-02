@@ -1,6 +1,4 @@
-const control = require('./control');
-
-const printf = control.printf.bind(control);
+const { printf } = require('../control');
 
 printf("%s", "victory");
 printf("%c", "victory");

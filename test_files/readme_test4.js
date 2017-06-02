@@ -1,7 +1,5 @@
+const { printf } = require('../control');
 
-const control = require('./control');
-
-const printf = control.printf.bind(control);
 const obj = {
     firstname:"victory",
     lastname: "osikwemhe",

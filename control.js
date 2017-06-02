@@ -623,4 +623,5 @@ class Control {
 const control = Control._initControl()
 module.exports = {
     printf: control.printf.bind(control),
+    control
 }
