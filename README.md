@@ -28,9 +28,7 @@ if you can work with c printf or the shell `printf` functionality, control will 
 **how to use formaters**
 
 ```javascript
-    const control = require('./control');
-    // using destructuring on printf will make the `this` keyword points to undefined
-    const printf = control.printf.bind(control);
+    const { printf } = require('./control');
     
     printf("my name is %s", "victory");
     printf("the first letter of my name is %c", "victory");
@@ -41,9 +39,7 @@ if you can work with c printf or the shell `printf` functionality, control will 
 
 ```javascript
 
-    const control = require('./control');
-    
-    const printf = control.printf.bind(control);
+    const { printf } = require('./control');
     
     printf("the %s cost %d", "bacon");
 
@@ -55,9 +51,7 @@ fieldwidths is the number of space a replacement string should forgo
 
 ```javascript
 
-    const control = require('./control');
-    
-    const printf = control.printf.bind(control);
+    const { printf } = require('./control');
 
     printf("the %34s cost dollars %d", "bacon",100);
 
@@ -75,10 +69,9 @@ precision works for the flowing formaters
 4. %u
 
 ```javascript
-    const control = require('./control');
-    
-    const printf = control.printf.bind(control);
-    
+
+    const { printf } = require('./control');    
+
     printf("%3.22d %.55u %.15e %.2f", 12, -1, 23, 24.56735);
     
 ```
@@ -91,9 +84,7 @@ precision works for the flowing formaters
 
 ```javascript
 
-    const control = require('./control');
-
-    const printf = control.printf.bind(control);
+    const { printf } = require('./control');
     
     const obj = {
         firstname:"victory",
@@ -118,8 +109,7 @@ precision works for the flowing formaters
 
 ```javascript
     
-    const control = require('./control');
-    const printf = control.printf.bind(control);
+    const { printf } = require('./control');
     
     printf("%.4c %.4s", "javascript", "node.js");
     
