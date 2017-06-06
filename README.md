@@ -2,6 +2,8 @@
 
 Control is an implementation of few of C `printf` functionality with extended features
 
+[![Build Status](https://travis-ci.org/zombieleet/control.svg?branch=master)](https://travis-ci.org/zombieleet/control)
+
 # how to install
 
 npm install --save control-js
