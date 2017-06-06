@@ -38,7 +38,7 @@ describe("#printf test", () => {
     describe("#make sure that all formaters was called", () => {
         beforeEach(() => {
 
-            spyOn(control, "__S");
+            spyOn(control, "__SF");
             spyOn(control, "__JN");
             spyOn(control, "__D");
             spyOn(control, "__C");
