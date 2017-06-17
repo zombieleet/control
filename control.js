@@ -444,8 +444,9 @@ class Control {
         }
 
         Control.handleFormaters(valid,this)
-
-        console.log(this.arguments.string)
+        if ( process.env.NODE_ENV === "production" ) {
+          console.log(this.arguments.string)
+        }
         
         
         return this.arguments.string

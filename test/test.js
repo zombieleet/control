@@ -23,7 +23,7 @@ describe("#printf test", () => {
         successFormater = undefined;
         realFormat = undefined;
     });
-    
+
 
     /*it("spies", () => {
         spyOn(control, "printf").and.callFake(() => {
@@ -34,7 +34,7 @@ describe("#printf test", () => {
         expect(typeof printf.calls.argsFor(0)[1]).toEqual('string');
      });*/
 
-    
+
     describe("#make sure that all formaters was called", () => {
         beforeEach(() => {
 
@@ -50,10 +50,10 @@ describe("#printf test", () => {
             spyOn(control, "__OB");
             spyOn(control, "__U");
             spyOn(control, "__X");
-            printf(`all this formaters method must be called %s %jn %d %c %e %f %o %bi %ar %ob %u %x`, "string", JSON.stringify({json:'json'}),23,"character",2.2,23.5,0x5ad,"binary", ["array"], {object:'object'}, -1, 22);        
-            
+            printf(`all this formaters method must be called %s %jn %d %c %e %f %o %bi %ar %ob %u %x`, "string", JSON.stringify({json:'json'}),23,"character",2.2,23.5,0x5ad,"binary", ["array"], {object:'object'}, -1, 22);
+
         });
-        
+
         it("should pass if __S function was called", () => {
             expect(control.__S).toHaveBeenCalled();
         });
@@ -86,10 +86,10 @@ describe("#printf test", () => {
         });
         it("should pass if __U function was called", () => {
             expect(control.__U).toHaveBeenCalled();
-        });        
+        });
         it("should pass if __X function was called", () => {
             expect(control.__X).toHaveBeenCalled();
-        });        
+        });
 
     });
     describe("#handle printf argument", () => {
