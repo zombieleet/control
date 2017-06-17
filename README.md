@@ -4,9 +4,26 @@ Control is an implementation of few of C `printf` functionality with extended fe
 
 [![Build Status](https://travis-ci.org/zombieleet/control.svg?branch=master)](https://travis-ci.org/zombieleet/control)
 
+# testing control-js
+
+`git clone https://github.com/zombieleet/control.git`
+
+`cd control`
+
+`npm install`
+
+`export NODE_ENV="development"` // linux and OSx
+
+`setx %NODE_ENV% development` // windows
+
+`npm test`
+
+
+
 # how to install
 
 npm install --save control-js
+
 
 # usage
 
